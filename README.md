@@ -17,43 +17,39 @@ A web application that allows users to search for movies, view detailed informat
 
 ## Tech Stack
 
-### Frontend
-- **Next.js 14** - React framework with App Router
+- **Next.js 14** - React framework with App Router and API Routes
 - **TypeScript** - Type safety
 - **Tailwind CSS** - Utility-first CSS framework
-- **React Hooks** - State management
-
-### Backend
-- **Node.js** - Runtime environment
-- **Express** - Web framework
 - **TMDB API** - Movie data source
+- **LocalStorage** - Client-side data persistence
 
 ## Project Structure
 
 ```
 movie_Explorer/
-├── backend/
-│   ├── server.js           # Express server with API proxy endpoints
-│   ├── package.json
-│   ├── .env.example
-│   └── .gitignore
-├── frontend/
-│   ├── app/
-│   │   ├── layout.tsx      # Root layout
-│   │   ├── page.tsx        # Main page with search and favorites
-│   │   └── globals.css     # Global styles
-│   ├── components/
-│   │   ├── MovieCard.tsx   # Movie card component
-│   │   └── MovieDetails.tsx # Modal with movie details
-│   ├── types/
-│   │   └── movie.ts        # TypeScript interfaces
-│   ├── utils/
-│   │   ├── api.ts          # API client functions
-│   │   └── localStorage.ts # LocalStorage utilities
-│   ├── package.json
-│   ├── tsconfig.json
-│   └── .env.local.example
-└── README.md
+├── app/
+│   ├── api/
+│   │   └── movies/
+│   │       ├── search/
+│   │       │   └── route.ts      # API: Search movies
+│   │       └── [id]/
+│   │           └── route.ts      # API: Get movie details
+│   ├── layout.tsx                # Root layout
+│   ├── page.tsx                  # Main page with search and favorites
+│   └── globals.css               # Global styles
+├── components/
+│   ├── MovieCard.tsx             # Movie card component
+│   └── MovieDetails.tsx          # Modal with movie details
+├── types/
+│   └── movie.ts                  # TypeScript interfaces
+├── utils/
+│   ├── api.ts                    # API client functions
+│   └── localStorage.ts           # LocalStorage utilities
+├── package.json
+├── tsconfig.json
+├── next.config.js
+├── tailwind.config.ts
+└── .env.local.example
 ```
 
 ## Setup Instructions
@@ -62,41 +58,12 @@ movie_Explorer/
 - Node.js 18+ installed
 - TMDB API key (get one at https://www.themoviedb.org/settings/api)
 
-### Backend Setup
+### Installation
 
-1. Navigate to the backend directory:
+1. Clone the repository:
 ```bash
-cd backend
-```
-
-2. Install dependencies:
-```bash
-npm install
-```
-
-3. Create `.env` file:
-```bash
-cp .env.example .env
-```
-
-4. Add your TMDB API key to `.env`:
-```
-TMDB_API_KEY=your_api_key_here
-PORT=5000
-```
-
-5. Start the server:
-```bash
-npm run dev
-```
-
-The backend will run on http://localhost:5000
-
-### Frontend Setup
-
-1. Navigate to the frontend directory:
-```bash
-cd frontend
+git clone <your-repo-url>
+cd movie_Explorer
 ```
 
 2. Install dependencies:
@@ -109,9 +76,9 @@ npm install
 cp .env.local.example .env.local
 ```
 
-4. Ensure the API URL is set correctly in `.env.local`:
+4. Add your TMDB API key to `.env.local`:
 ```
-NEXT_PUBLIC_API_URL=http://localhost:5000
+TMDB_API_KEY=your_api_key_here
 ```
 
 5. Start the development server:
@@ -119,7 +86,7 @@ NEXT_PUBLIC_API_URL=http://localhost:5000
 npm run dev
 ```
 
-The frontend will run on http://localhost:3000
+6. Open http://localhost:3000 in your browser
 
 ## Usage
 
@@ -133,10 +100,14 @@ The frontend will run on http://localhost:3000
 
 ## Technical Decisions & Tradeoffs
 
-### API Proxy Pattern
-- **Decision**: Used Express backend as a proxy for TMDB API
-- **Reasoning**: Keeps API key secure server-side, prevents exposure in browser
-- **Tradeoff**: Additional server required vs simpler client-only approach
+### Next.js API Routes
+- **Decision**: Used Next.js API routes instead of separate Express backend
+- **Reasoning**:
+  - Keeps everything in one project (simpler deployment)
+  - API key secured server-side (not exposed in browser)
+  - Leverages Next.js built-in features
+  - Single codebase, one deployment
+- **Tradeoff**: Tightly coupled to Next.js vs microservices architecture
 
 ### State Management
 - **Decision**: React hooks (useState, useEffect) without external state library
@@ -145,7 +116,10 @@ The frontend will run on http://localhost:3000
 
 ### Persistence Strategy
 - **Decision**: LocalStorage for baseline implementation
-- **Reasoning**: Quick implementation, no database setup, works offline
+- **Reasoning**:
+  - Quick implementation, no database setup
+  - Works offline
+  - Meets baseline requirements
 - **Tradeoff**: Data is device-specific, not synced across devices
 
 ### UI Framework
@@ -153,50 +127,71 @@ The frontend will run on http://localhost:3000
 - **Reasoning**: Rapid development, consistent styling, small bundle size
 - **Tradeoff**: Utility class verbosity vs custom CSS
 
-### Separate Backend/Frontend
-- **Decision**: Split into separate backend and frontend folders
-- **Reasoning**: Clear separation of concerns, easier to understand and deploy independently
-- **Tradeoff**: Could have used Next.js API routes for simpler monorepo structure
+### TypeScript
+- **Decision**: Full TypeScript implementation
+- **Reasoning**: Type safety, better developer experience, catches errors early
+- **Tradeoff**: Slightly more verbose than JavaScript
 
 ## Known Limitations
 
 1. **No Authentication**: Favorites are stored locally, not per-user account
 2. **No Cross-Device Sync**: Favorites don't sync across devices
-3. **Limited Movie Data**: Only shows data available from TMDB API
-4. **No Offline Search**: Requires internet connection to search
-5. **Basic UI**: Functional but minimal design (intentional for 3-hour scope)
-6. **No Pagination**: Search results show only first page
-7. **No Advanced Filters**: Can't filter by genre, year, rating, etc.
+3. **No Offline Search**: Requires internet connection to search (TMDB API)
+4. **Basic UI**: Functional but minimal design (intentional for 3-hour scope)
+5. **No Pagination**: Search results show only first page
+6. **No Advanced Filters**: Can't filter by genre, year, rating, etc.
+7. **No Image Fallback**: Placeholder text shown when no poster available
 
 ## Future Improvements
 
 With more time, I would add:
 
-1. **User Authentication**: Allow multiple users with accounts
+1. **User Authentication**: NextAuth.js for user accounts
 2. **Database Integration**: PostgreSQL or MongoDB for server-side persistence
 3. **Advanced Search**: Filters for genre, year, rating, etc.
 4. **Pagination**: Browse through all search results
 5. **Watchlist Feature**: Separate list for movies to watch
 6. **Social Features**: Share favorites, see friends' recommendations
 7. **Responsive Improvements**: Better mobile experience
-8. **Loading Skeletons**: Better loading states
-9. **Image Optimization**: Next.js Image component
-10. **Testing**: Unit and integration tests
+8. **Loading Skeletons**: Better loading states with skeleton screens
+9. **Image Optimization**: Use Next.js Image component
+10. **Testing**: Unit tests (Jest) and E2E tests (Playwright)
+11. **Accessibility**: ARIA labels, keyboard navigation
+12. **Error Boundaries**: Better error handling with React error boundaries
 
 ## Deployment
 
-### Backend Deployment (Render/Railway/Heroku)
-1. Push code to GitHub
-2. Connect repository to hosting service
-3. Set environment variables (TMDB_API_KEY)
-4. Deploy
+### Vercel (Recommended for Next.js)
 
-### Frontend Deployment (Vercel/Netlify)
 1. Push code to GitHub
-2. Connect repository to hosting service
-3. Set build directory to `frontend`
-4. Set environment variables (NEXT_PUBLIC_API_URL with production backend URL)
+2. Go to [vercel.com](https://vercel.com)
+3. Import your repository
+4. Add environment variable: `TMDB_API_KEY`
 5. Deploy
+
+### Netlify
+
+1. Push code to GitHub
+2. Go to [netlify.com](https://netlify.com)
+3. Import your repository
+4. Build command: `npm run build`
+5. Publish directory: `.next`
+6. Add environment variable: `TMDB_API_KEY`
+7. Deploy
+
+## API Routes
+
+### Search Movies
+```
+GET /api/movies/search?query={searchTerm}
+```
+
+### Get Movie Details
+```
+GET /api/movies/{movieId}
+```
+
+Both routes proxy requests to TMDB API with the server-side API key.
 
 ## License
 
