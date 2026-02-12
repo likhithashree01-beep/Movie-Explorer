@@ -148,14 +148,14 @@ export default function Home() {
                 {favorites.map((movie) => (
                   <div key={movie.id} className="flex flex-col">
                     <MovieCard movie={movie} onClick={() => setSelectedMovie(movie)} />
-                    {movie.personalRating && movie.personalRating > 0 && (
-                      <div className="mt-2 text-center">
+                    <div className="mt-2 text-center h-8">
+                      {movie.personalRating && movie.personalRating > 0 && (
                         <span className="text-yellow-400">
                           {'★'.repeat(movie.personalRating)}
                           {'☆'.repeat(5 - movie.personalRating)}
                         </span>
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
