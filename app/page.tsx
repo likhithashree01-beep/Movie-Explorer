@@ -146,7 +146,7 @@ export default function Home() {
             {favorites.length > 0 ? (
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
                 {favorites.map((movie) => (
-                  <div key={movie.id}>
+                  <div key={movie.id} className="flex flex-col">
                     <MovieCard movie={movie} onClick={() => setSelectedMovie(movie)} />
                     {movie.personalRating && (
                       <div className="mt-2 text-center">

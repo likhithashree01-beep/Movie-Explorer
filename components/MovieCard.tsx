@@ -8,8 +8,8 @@ interface MovieCardProps {
 
 export default function MovieCard({ movie, onClick }: MovieCardProps) {
   return (
-    <div className="card cursor-pointer hover:shadow-lg transition-shadow" onClick={onClick}>
-      <div className="aspect-[2/3] relative bg-gray-200">
+    <div className="card cursor-pointer hover:shadow-lg transition-shadow flex flex-col h-full" onClick={onClick}>
+      <div className="aspect-[2/3] relative bg-gray-200 flex-shrink-0">
         {movie.poster_path ? (
           <img
             src={getImageUrl(movie.poster_path)}
@@ -22,7 +22,7 @@ export default function MovieCard({ movie, onClick }: MovieCardProps) {
           </div>
         )}
       </div>
-      <div className="p-4">
+      <div className="p-4 flex-1 flex flex-col">
         <h3 className="font-semibold text-lg mb-1 line-clamp-2">{movie.title}</h3>
         <p className="text-sm text-gray-600 mb-2">
           {movie.release_date ? new Date(movie.release_date).getFullYear() : 'N/A'}
