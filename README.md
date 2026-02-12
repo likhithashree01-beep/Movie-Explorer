@@ -23,35 +23,6 @@ A web application that allows users to search for movies, view detailed informat
 - **TMDB API** - Movie data source
 - **LocalStorage** - Client-side data persistence
 
-## Project Structure
-
-```
-movie_Explorer/
-├── app/
-│   ├── api/
-│   │   └── movies/
-│   │       ├── search/
-│   │       │   └── route.ts      # API: Search movies
-│   │       └── [id]/
-│   │           └── route.ts      # API: Get movie details
-│   ├── layout.tsx                # Root layout
-│   ├── page.tsx                  # Main page with search and favorites
-│   └── globals.css               # Global styles
-├── components/
-│   ├── MovieCard.tsx             # Movie card component
-│   └── MovieDetails.tsx          # Modal with movie details
-├── types/
-│   └── movie.ts                  # TypeScript interfaces
-├── utils/
-│   ├── api.ts                    # API client functions
-│   └── localStorage.ts           # LocalStorage utilities
-├── package.json
-├── tsconfig.json
-├── next.config.js
-├── tailwind.config.ts
-└── .env.local.example
-```
-
 ## Setup Instructions
 
 ### Prerequisites
@@ -161,23 +132,13 @@ With more time, I would add:
 
 ## Deployment
 
-### Vercel (Recommended for Next.js)
+### Vercel
 
 1. Push code to GitHub
 2. Go to [vercel.com](https://vercel.com)
 3. Import your repository
 4. Add environment variable: `TMDB_API_KEY`
 5. Deploy
-
-### Netlify
-
-1. Push code to GitHub
-2. Go to [netlify.com](https://netlify.com)
-3. Import your repository
-4. Build command: `npm run build`
-5. Publish directory: `.next`
-6. Add environment variable: `TMDB_API_KEY`
-7. Deploy
 
 ## API Routes
 
@@ -192,11 +153,3 @@ GET /api/movies/{movieId}
 ```
 
 Both routes proxy requests to TMDB API with the server-side API key.
-
-## License
-
-MIT
-
-## Author
-
-Built as a technical interview project
