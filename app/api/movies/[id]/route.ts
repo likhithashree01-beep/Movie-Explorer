@@ -10,11 +10,21 @@ export async function GET(
   try {
     const { id } = params;
 
+    if (!TMDB_API_KEY) {
+      console.error('TMDB_API_KEY is not set');
+      return NextResponse.json(
+        { error: 'API configuration error. Please set TMDB_API_KEY environment variable.' },
+        { status: 500 }
+      );
+    }
+
     const response = await fetch(
       `${TMDB_BASE_URL}/movie/${id}?api_key=${TMDB_API_KEY}`
     );
 
     if (!response.ok) {
+      const errorData = await response.json();
+      console.error('TMDB API error:', errorData);
       throw new Error('Failed to fetch movie details');
     }
 
