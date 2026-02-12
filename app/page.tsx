@@ -62,10 +62,10 @@ export default function Home() {
 
   return (
     <div className="min-h-screen">
-      <header className="bg-blue-600 text-white py-6 shadow-lg">
+      <header className="bg-indigo-600 text-white py-6 shadow-lg">
         <div className="container mx-auto px-4">
           <h1 className="text-3xl font-bold">Movie Explorer</h1>
-          <p className="text-blue-100 mt-1">Search, discover, and save your favorite movies</p>
+          <p className="text-indigo-100 mt-1">Search, discover, and save your favorite movies</p>
         </div>
       </header>
 
@@ -76,7 +76,7 @@ export default function Home() {
             onClick={() => setActiveTab('search')}
             className={`px-4 py-2 font-semibold ${
               activeTab === 'search'
-                ? 'text-blue-600 border-b-2 border-blue-600'
+                ? 'text-indigo-600 border-b-2 border-indigo-600'
                 : 'text-gray-600 hover:text-gray-900'
             }`}
           >
@@ -86,7 +86,7 @@ export default function Home() {
             onClick={() => setActiveTab('favorites')}
             className={`px-4 py-2 font-semibold ${
               activeTab === 'favorites'
-                ? 'text-blue-600 border-b-2 border-blue-600'
+                ? 'text-indigo-600 border-b-2 border-indigo-600'
                 : 'text-gray-600 hover:text-gray-900'
             }`}
           >

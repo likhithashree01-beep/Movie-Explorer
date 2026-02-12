@@ -11,7 +11,7 @@ body {
 }
 
 .btn-primary {
-  @apply bg-blue-600 text-white hover:bg-blue-700;
+  @apply bg-indigo-600 text-white hover:bg-indigo-700;
 }
 
 .btn-secondary {
@@ -23,7 +23,7 @@ body {
 }
 
 .input {
-  @apply border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500;
+  @apply border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500;
 }
 
 .card {
