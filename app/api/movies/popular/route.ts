@@ -6,15 +6,7 @@ const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
-    const query = searchParams.get('query');
     const page = searchParams.get('page') || '1';
-
-    if (!query) {
-      return NextResponse.json(
-        { error: 'Query parameter is required' },
-        { status: 400 }
-      );
-    }
 
     if (!TMDB_API_KEY) {
       console.error('TMDB_API_KEY is not set');
@@ -25,7 +17,7 @@ export async function GET(request: NextRequest) {
     }
 
     const response = await fetch(
-      `${TMDB_BASE_URL}/search/movie?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(query)}&page=${page}`
+      `${TMDB_BASE_URL}/movie/popular?api_key=${TMDB_API_KEY}&page=${page}`
     );
 
     if (!response.ok) {
@@ -37,9 +29,9 @@ export async function GET(request: NextRequest) {
     const data = await response.json();
     return NextResponse.json(data);
   } catch (error) {
-    console.error('Search error:', error);
+    console.error('Popular movies error:', error);
     return NextResponse.json(
-      { error: 'Failed to search movies' },
+      { error: 'Failed to fetch popular movies' },
       { status: 500 }
     );
   }

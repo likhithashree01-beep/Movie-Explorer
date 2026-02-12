@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Movie, FavoriteMovie } from '@/types/movie';
-import { searchMovies, getMovieDetails } from '@/utils/api';
+import { searchMovies, getMovieDetails, getPopularMovies } from '@/utils/api';
 import { getFavorites } from '@/utils/localStorage';
 import MovieCard from '@/components/MovieCard';
 import MovieDetails from '@/components/MovieDetails';
@@ -15,35 +15,82 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState<'search' | 'favorites'>('search');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [mode, setMode] = useState<'popular' | 'search'>('popular');
 
   useEffect(() => {
     loadFavorites();
+    loadPopularMovies(1);
   }, []);
 
   const loadFavorites = () => {
     setFavorites(getFavorites());
   };
 
+  const loadPopularMovies = async (page: number) => {
+    setLoading(true);
+    setError('');
+    try {
+      const data = await getPopularMovies(page);
+      setMovies(data.results);
+      setCurrentPage(data.page);
+      setTotalPages(Math.min(data.total_pages, 500)); // TMDB limits to 500 pages
+      setMode('popular');
+    } catch (err) {
+      setError('Failed to load movies. Please try again.');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!searchQuery.trim()) {
-      setError('Please enter a search term');
+      loadPopularMovies(1);
       return;
     }
 
     setLoading(true);
     setError('');
+    setCurrentPage(1);
 
     try {
-      const data = await searchMovies(searchQuery);
+      const data = await searchMovies(searchQuery, 1);
       setMovies(data.results);
+      setCurrentPage(data.page);
+      setTotalPages(Math.min(data.total_pages, 500));
+      setMode('search');
 
       if (data.results.length === 0) {
         setError('No movies found. Try a different search term.');
       }
     } catch (err) {
       setError('Failed to search movies. Please try again.');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePageChange = async (page: number) => {
+    if (page < 1 || page > totalPages) return;
+
+    setLoading(true);
+    setError('');
+
+    try {
+      const data = mode === 'search'
+        ? await searchMovies(searchQuery, page)
+        : await getPopularMovies(page);
+
+      setMovies(data.results);
+      setCurrentPage(data.page);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (err) {
+      setError('Failed to load movies. Please try again.');
       console.error(err);
     } finally {
       setLoading(false);
@@ -58,6 +105,67 @@ export default function Home() {
       setError('Failed to load movie details');
       console.error(err);
     }
+  };
+
+  const renderPagination = () => {
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    return (
+      <div className="flex justify-center items-center gap-2 mt-8">
+        <button
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1 || loading}
+          className="btn btn-secondary disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Previous
+        </button>
+
+        {startPage > 1 && (
+          <>
+            <button onClick={() => handlePageChange(1)} className="btn btn-secondary">
+              1
+            </button>
+            {startPage > 2 && <span className="px-2">...</span>}
+          </>
+        )}
+
+        {Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i).map((page) => (
+          <button
+            key={page}
+            onClick={() => handlePageChange(page)}
+            disabled={loading}
+            className={`btn ${
+              page === currentPage ? 'btn-primary' : 'btn-secondary'
+            } disabled:opacity-50`}
+          >
+            {page}
+          </button>
+        ))}
+
+        {endPage < totalPages && (
+          <>
+            {endPage < totalPages - 1 && <span className="px-2">...</span>}
+            <button onClick={() => handlePageChange(totalPages)} className="btn btn-secondary">
+              {totalPages}
+            </button>
+          </>
+        )}
+
+        <button
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages || loading}
+          className="btn btn-secondary disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Next
+        </button>
+      </div>
+    );
   };
 
   return (
@@ -80,7 +188,7 @@ export default function Home() {
                 : 'text-gray-600 hover:text-gray-900'
             }`}
           >
-            Search Movies
+            Browse Movies
           </button>
           <button
             onClick={() => setActiveTab('favorites')}
@@ -123,18 +231,24 @@ export default function Home() {
                 <p className="text-gray-600">Loading...</p>
               </div>
             ) : movies.length > 0 ? (
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-                {movies.map((movie) => (
-                  <MovieCard
-                    key={movie.id}
-                    movie={movie}
-                    onClick={() => handleMovieClick(movie.id)}
-                  />
-                ))}
-              </div>
+              <>
+                <div className="mb-4 text-sm text-gray-600">
+                  {mode === 'popular' ? 'Popular Movies' : `Search Results for "${searchQuery}"`} - Page {currentPage} of {totalPages}
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                  {movies.map((movie) => (
+                    <MovieCard
+                      key={movie.id}
+                      movie={movie}
+                      onClick={() => handleMovieClick(movie.id)}
+                    />
+                  ))}
+                </div>
+                {renderPagination()}
+              </>
             ) : (
               <div className="text-center py-12 text-gray-600">
-                <p>Search for movies to get started</p>
+                <p>No movies found</p>
               </div>
             )}
           </>

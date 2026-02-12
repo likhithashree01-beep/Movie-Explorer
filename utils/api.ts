@@ -1,10 +1,20 @@
 import { Movie, SearchResponse } from '@/types/movie';
 
-export const searchMovies = async (query: string): Promise<SearchResponse> => {
-  const response = await fetch(`/api/movies/search?query=${encodeURIComponent(query)}`);
+export const searchMovies = async (query: string, page: number = 1): Promise<SearchResponse> => {
+  const response = await fetch(`/api/movies/search?query=${encodeURIComponent(query)}&page=${page}`);
 
   if (!response.ok) {
     throw new Error('Failed to search movies');
+  }
+
+  return response.json();
+};
+
+export const getPopularMovies = async (page: number = 1): Promise<SearchResponse> => {
+  const response = await fetch(`/api/movies/popular?page=${page}`);
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch popular movies');
   }
 
   return response.json();
