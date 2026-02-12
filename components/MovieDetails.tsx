@@ -37,7 +37,11 @@ export default function MovieDetails({ movie, onClose, onFavoritesChange }: Movi
       setPersonalRating(0);
       setPersonalNote('');
     } else {
-      addFavorite({ ...movie, personalRating, personalNote });
+      addFavorite({
+        ...movie,
+        personalRating: personalRating > 0 ? personalRating : undefined,
+        personalNote
+      });
       setIsInFavorites(true);
     }
     onFavoritesChange();
